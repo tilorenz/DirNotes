@@ -1,0 +1,16 @@
+[Desktop Entry]
+Name=WebDAV Notes
+Comment=Sticky Notes applet with WebDAV Sync
+Icon=knotes
+Type=Service
+X-Plasma-API=declarativeappletscript
+X-KDE-ServiceTypes=Plasma/Applet
+X-Plasma-MainScript=ui/main.qml
+X-KDE-PluginInfo-Author=Tino Lorenz
+X-KDE-PluginInfo-Email=tilrnz@gmx.net
+X-KDE-PluginInfo-Name=com.github.tilorenz.webdavnotes
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-Website=https://github.com/tilorenz/webdavnotes
+X-KDE-PluginInfo-Category=Utilities
+X-KDE-PluginInfo-License=GPL-2.0+
+X-KDE-PluginInfo-EnabledByDefault=true

@@ -1,0 +1,6 @@
+build/*
+CMakeFiles/*
+.cache/*
+build-wdnplugin-Desktop-Debug/*
+CMakeCache.txt
+
