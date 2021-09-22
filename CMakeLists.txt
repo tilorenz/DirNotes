@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.16)
 
 ################# Disallow in-source build #################
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
@@ -34,12 +34,17 @@ include(KDECMakeSettings)
 set(SRC_LIST
 	plugin/wdnplugin.cpp
 	plugin/docmodel.cpp
+	plugin/dirtreemodel.cpp
 	)
 
 find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED
 	Core
 	Quick
 	Qml
+	)
+
+find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS
+	KIO
 	)
 
 #add_definitions(-DTRANSLATION_DOMAIN="com.github.tilorenz.wdnplugin")
@@ -54,6 +59,7 @@ add_library(${PROJECT_NAME} SHARED ${SRC_LIST} qmltypes)
 
 target_link_libraries(${PROJECT_NAME}
 	Qt::Quick
+	KF5::KIOWidgets
 	)
 
 ### PACKAGE

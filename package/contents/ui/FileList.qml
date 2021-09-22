@@ -8,6 +8,9 @@ import org.kde.plasma.extras 2.0 as PlasmaExtras
 import org.kde.kquickcontrolsaddons 2.0 as KQuickControlsAddonsComponents
 import Qt.labs.folderlistmodel 2.15
 import org.kde.kirigami 2.4 as Kirigami
+import org.kde.kirigamiaddons.treeview 1.0 as KiriAdd
+
+import com.github.tilorenz.wdnplugin 1.0 as WDNPlugin
 
 //dir-up, new folder, new file
 
@@ -29,6 +32,17 @@ ColumnLayout{
 		rootFolder: notesPath
 		showOnlyReadable: true
 		nameFilters: ["*.md", "*.txt"]
+	}
+
+	WDNPlugin.DirTreeModel{
+		id: dtMod
+		url: notesPath
+		onRowsInserted: {
+			print("from qml: ri")
+			tlv.model = dtMod
+			fLst.model = dtMod
+		}
+			
 	}
 
 	RowLayout{
@@ -78,13 +92,26 @@ ColumnLayout{
 		Layout.alignment: Qt.AlignBottom
 		Layout.fillHeight: true
 
+		
+		KiriAdd.TreeListView{
+			id: tlv
+			anchors.fill: parent
+			//model: dtMod
+
+			delegate: KiriAdd.BasicTreeItem{
+				id: tlvDelegate
+				label: fileName
+			}
+		}
+		
+
 		ListView{
 			id: fLst
 			anchors.fill: parent
 			clip: true
 			focus: true
 			boundsBehavior: Flickable.StopAtBounds
-			model: folderModel
+			//model: dtMod
 
 			delegate: Kirigami.BasicListItem {
 				id: fLstDelegate
