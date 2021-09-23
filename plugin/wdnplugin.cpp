@@ -1,7 +1,6 @@
 #include "wdnplugin.h"
 #include "docmodel.h"
 #include "dirtreemodel.h"
-#include <KDirSortFilterProxyModel>
 #include <qqml.h>
 
 void WDNPlugin::registerTypes(const char *uri){
@@ -9,7 +8,6 @@ void WDNPlugin::registerTypes(const char *uri){
 
     qmlRegisterType<DocModel>(uri, 1, 0, "DocModel");
     qmlRegisterType<DirTreeModel>(uri, 1, 0, "DirTreeModel");
-    qmlRegisterType<KDirSortFilterProxyModel>(uri, 1, 0, "ProxyModel");
 
     qmlProtectModule("com.github.tilorenz.wdnplugin", 1);
 }

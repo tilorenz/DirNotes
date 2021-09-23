@@ -10,6 +10,7 @@ import org.kde.kquickcontrolsaddons 2.0 as KQuickControlsAddonsComponents
 import Qt.labs.folderlistmodel 2.15
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.kirigamiaddons.treeview 1.0 as KiriAdd
+import org.kde.kitemmodels 1.0 as KItemModels
 
 import com.github.tilorenz.wdnplugin 1.0 as WDNPlugin
 
@@ -39,9 +40,11 @@ ColumnLayout{
 		id: dtMod
 		url: notesPath
 	}
-	WDNPlugin.ProxyModel{
+	KItemModels.KSortFilterProxyModel{
 		id: prox
 		sourceModel: dtMod
+		sortColumn: 0
+		sortOrder: Qt.AscendingOrder
 	}
 
 	RowLayout{

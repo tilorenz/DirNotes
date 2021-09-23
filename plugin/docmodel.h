@@ -1,3 +1,5 @@
+#ifndef DOCMODEL_H
+#define DOCMODEL_H
 #include <QObject>
 #include <QString>
 #include <QUrl>
@@ -32,5 +34,5 @@ class DocModel : public QObject{
 	QString m_text;
 	QUrl m_url;
 };
-
+#endif
 

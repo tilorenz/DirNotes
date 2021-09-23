@@ -1,3 +1,5 @@
+#ifndef WDNPLUGIN_H
+#define WDNPLUGIN_H
 #include <QQmlEngine>
 #include <QQmlExtensionPlugin>
 #include <qobjectdefs.h>
@@ -12,4 +14,5 @@ class WDNPlugin: public QQmlExtensionPlugin{
 	public:
 	void registerTypes(const char *uri) override;
 };
+#endif
 

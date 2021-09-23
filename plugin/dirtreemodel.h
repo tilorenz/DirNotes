@@ -1,3 +1,5 @@
+#ifndef DIRTREEMODEL_H
+#define DIRTREEMODEL_H
 #include <KDirModel>
 #include <qabstractitemmodel.h>
 #include <qnamespace.h>
@@ -58,3 +60,5 @@ class DirTreeModel: public KDirModel{
 	private:
 	QUrl m_url;
 };
+#endif
+

@@ -11,6 +11,8 @@ set(PROJECT_VERSION_MAJOR 5)
 set(QT_MIN_VERSION 5.15.0)
 set(KF5_MIN_VERSION 5.79.0)
 
+set(CMAKE_CXX_COMPILER /usr/bin/clazy)
+
 
 ### PLUGIN
 project(wdnplugin)
@@ -35,6 +37,7 @@ set(SRC_LIST
 	plugin/wdnplugin.cpp
 	plugin/docmodel.cpp
 	plugin/dirtreemodel.cpp
+	plugin/dirproxymodel.h
 	)
 
 find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED
