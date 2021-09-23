@@ -1,5 +1,6 @@
 import QtQuick 2.6 
 import QtQuick.Controls 2.15 as QQC
+import QtQuick.Controls 1.4 as QQC1
 import QtQuick.Layouts 1.1
 import org.kde.plasma.plasmoid 2.0
 import org.kde.plasma.core 2.0 as PlasmaCore
@@ -37,12 +38,10 @@ ColumnLayout{
 	WDNPlugin.DirTreeModel{
 		id: dtMod
 		url: notesPath
-		onRowsInserted: {
-			print("from qml: ri")
-			tlv.model = dtMod
-			fLst.model = dtMod
-		}
-			
+	}
+	WDNPlugin.ProxyModel{
+		id: prox
+		sourceModel: dtMod
 	}
 
 	RowLayout{
@@ -56,7 +55,7 @@ ColumnLayout{
 			Layout.alignment: Qt.AlignLeft
 			icon.name: "arrow-up"
 			focusPolicy: Qt.TabFocus
-			onClicked: notesPath = folderModel.parentFolder
+			onClicked: notesPath = dtMod.dirUp()
 			QQC.ToolTip{
 				text: "Directory up"
 			}
@@ -86,39 +85,33 @@ ColumnLayout{
 			}
 		}
 	}
-
 	PlasmaExtras.ScrollArea{
 		id: scrArea
 		Layout.alignment: Qt.AlignBottom
 		Layout.fillHeight: true
 
+		//QQC1.TreeView{
+			//id: oldTreeView
+			//model: dtMod
+			//QQC1.TableViewColumn{
+				//title: "Name"
+				//role: fileName
+			//}
+			//itemDelegate: KiriAdd.BasicTreeItem{
+				//id: oldTreeDel
+			//}
+		//}
 		
 		KiriAdd.TreeListView{
 			id: tlv
 			anchors.fill: parent
-			//model: dtMod
+			model: prox
 
 			delegate: KiriAdd.BasicTreeItem{
 				id: tlvDelegate
 				label: fileName
-			}
-		}
-		
 
-		ListView{
-			id: fLst
-			anchors.fill: parent
-			clip: true
-			focus: true
-			boundsBehavior: Flickable.StopAtBounds
-			//model: dtMod
-
-			delegate: Kirigami.BasicListItem {
-				id: fLstDelegate
-				label: fileName
-				icon: fileIsDir ? "folder-symbolic" : "view-list-text"
-
-				onClicked: if(fileIsDir){
+				onClicked: if(isDir){
 					notesPath = fileUrl
 				} else{
 					currDoc = fileUrl
@@ -126,6 +119,29 @@ ColumnLayout{
 				}
 			}
 		}
+		
+
+		//ListView{
+			//id: fLst
+			//anchors.fill: parent
+			//clip: true
+			//focus: true
+			//boundsBehavior: Flickable.StopAtBounds
+			//model: dtMod
+
+			//delegate: Kirigami.BasicListItem {
+				//id: fLstDelegate
+				//label: fileName
+				//icon: isDir ? "folder-symbolic" : "view-list-text"
+
+				//onClicked: if(isDir){
+					//notesPath = fileUrl
+				//} else{
+					//currDoc = fileUrl
+					//print("path: " + fileUrl)
+				//}
+			//}
+		//}
 	}
 }
 

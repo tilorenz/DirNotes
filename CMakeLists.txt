@@ -59,7 +59,7 @@ add_library(${PROJECT_NAME} SHARED ${SRC_LIST} qmltypes)
 
 target_link_libraries(${PROJECT_NAME}
 	Qt::Quick
-	KF5::KIOWidgets
+	KF5::KIOCore KF5::KIOFileWidgets KF5::KIOWidgets KF5::KIONTLM
 	)
 
 ### PACKAGE
