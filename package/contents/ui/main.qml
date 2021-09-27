@@ -33,6 +33,8 @@ RowLayout {
 	FileList{
 		id: fChooser
 		Layout.alignment: Qt.AlignLeft
+		Layout.fillWidth: true
+		Layout.fillHeight: true
 
 	}
 

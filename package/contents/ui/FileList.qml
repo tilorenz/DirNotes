@@ -3,52 +3,42 @@ import QtQuick.Controls 2.15 as QQC
 import QtQuick.Controls 1.4 as QQC1
 import QtQuick.Layouts 1.1
 import org.kde.plasma.plasmoid 2.0
-import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 2.0 as PlasmaComponents
-import org.kde.plasma.extras 2.0 as PlasmaExtras
+import org.kde.plasma.core 2.0 as PCore
+import org.kde.plasma.components 2.0 as PComp2
+import org.kde.plasma.components 3.0 as PComp3
+import org.kde.plasma.extras 2.0 as PExtras
 import org.kde.kquickcontrolsaddons 2.0 as KQuickControlsAddonsComponents
-import Qt.labs.folderlistmodel 2.15
 import org.kde.kirigami 2.4 as Kirigami
 import org.kde.kirigamiaddons.treeview 1.0 as KiriAdd
 import org.kde.kitemmodels 1.0 as KItemModels
 
 import com.github.tilorenz.wdnplugin 1.0 as WDNPlugin
 
-//dir-up, new folder, new file
-
 ColumnLayout{
 	id: fSelect
+	Layout.fillWidth: true
+	Layout.fillHeight: true
+	implicitWidth: scrArea.implicitWidth
 	//anchors.fill: parent
 
 	property url notesPath: "file:///home/tino/projects/plasmoids/notes/testDir/"
 	//TODO: remember last used doc
 	property url currDoc: ""
 
-	/*TODO:
-	 * - write own FolderTreeModel that doesn't need QApplication
-	 * - replace the list view by Kirigami.TreeListView
-	 */
-	FolderListModel{
-		id: folderModel
-		folder: notesPath
-		rootFolder: notesPath
-		showOnlyReadable: true
-		nameFilters: ["*.md", "*.txt"]
-	}
-
 	WDNPlugin.DirTreeModel{
 		id: dtMod
 		url: notesPath
+		onUrlChanged: notesPath = url
 	}
 	KItemModels.KSortFilterProxyModel{
 		id: prox
 		sourceModel: dtMod
-		sortColumn: 0
+		sortRole: "fileName"
 		sortOrder: Qt.AscendingOrder
 	}
 
 	RowLayout{
-		id: ctrlButtons
+		id: ctrlButtonBar
 		Layout.maximumHeight: dirUpBtn.implicitHeight
 		Layout.preferredWidth: scrArea.width
 		Layout.minimumWidth: scrArea.width
@@ -58,7 +48,7 @@ ColumnLayout{
 			Layout.alignment: Qt.AlignLeft
 			icon.name: "arrow-up"
 			focusPolicy: Qt.TabFocus
-			onClicked: notesPath = dtMod.dirUp()
+			onClicked: dtMod.dirUp()
 			QQC.ToolTip{
 				text: "Directory up"
 			}
@@ -77,74 +67,64 @@ ColumnLayout{
 		}
 
 		QQC.ToolButton{
-			id: newFolderBtn
+			id: fileMgrBtn
 			Layout.alignment: Qt.AlignRight
-			icon.name: "folder-new-symbolic"
+			icon.name: "folder-open-symbolic"
 			focusPolicy: Qt.TabFocus
 			//TODO
 			//onClicked: notesPath = folderModel.parentFolder
 			QQC.ToolTip{
-				text: "New Folder"
+				text: "Open folder in File Manager"
 			}
 		}
 	}
-	PlasmaExtras.ScrollArea{
-		id: scrArea
-		Layout.alignment: Qt.AlignBottom
+	QQC1.TreeView{
+		id: fileTree
+		model: prox
+		//Layout.fillWidth: true
 		Layout.fillHeight: true
+		implicitWidth: fileDelegate.implicitWidth
 
-		//QQC1.TreeView{
-			//id: oldTreeView
-			//model: dtMod
-			//QQC1.TableViewColumn{
-				//title: "Name"
-				//role: fileName
+
+		alternatingRowColors: false
+		headerVisible: false
+
+		QQC1.TableViewColumn{
+			title: "Name"
+			role: "fileName"
+		}
+
+		rowDelegate: Rectangle{
+			MouseArea{
+				id: rowMouseArea
+				anchors.fill: parent
+				hoverEnabled: true //handle containsMouse...
+				propagateComposedEvents: true //...and let other areas do their job
+				acceptedButtons: Qt.NoButton
+			}
+			color: rowMouseArea.containsMouse ? PCore.Theme.highlightColor : PCore.Theme.backgroundColor
+		}
+
+		itemDelegate: PComp3.Label{
+			id: fileDelegate
+			text: styleData.value
+			color: PCore.Theme.textColor
+			//background: Rectangle{
+				//color: PCore.Theme.backgroundColor
 			//}
-			//itemDelegate: KiriAdd.BasicTreeItem{
-				//id: oldTreeDel
-			//}
-		//}
-		
-		KiriAdd.TreeListView{
-			id: tlv
-			anchors.fill: parent
-			model: prox
 
-			delegate: KiriAdd.BasicTreeItem{
-				id: tlvDelegate
-				label: fileName
-
-				onClicked: if(isDir){
-					notesPath = fileUrl
-				} else{
-					currDoc = fileUrl
-					print("path: " + fileUrl)
+			MouseArea{
+				anchors.fill: parent
+				onClicked:{
+					var ind = prox.mapToSource(styleData.index)
+					if(dtMod.isDir(ind)){
+						dtMod.url = dtMod.urlForIndex(ind)
+					} else{
+						currDoc = dtMod.urlForIndex(ind)
+					}
 				}
 			}
 		}
-		
-
-		//ListView{
-			//id: fLst
-			//anchors.fill: parent
-			//clip: true
-			//focus: true
-			//boundsBehavior: Flickable.StopAtBounds
-			//model: dtMod
-
-			//delegate: Kirigami.BasicListItem {
-				//id: fLstDelegate
-				//label: fileName
-				//icon: isDir ? "folder-symbolic" : "view-list-text"
-
-				//onClicked: if(isDir){
-					//notesPath = fileUrl
-				//} else{
-					//currDoc = fileUrl
-					//print("path: " + fileUrl)
-				//}
-			//}
-		//}
 	}
 }
 

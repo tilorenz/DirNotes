@@ -28,23 +28,24 @@ class DirTreeModel: public KDirModel{
 
 
 	int columnCount(const QModelIndex &parent = QModelIndex()) const{
-		qDebug() << "columnCount called" << Qt::endl;
+		//qDebug() << "columnCount called: " << parent << Qt::endl;
 		return KDirModel::columnCount(parent);
 	}
 
 	QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const{
-		qDebug() << "index called" << Qt::endl;
+		//qDebug() << "index called: " << row << ", " << column << ", "
+			//<< parent << Qt::endl;
 		return KDirModel::index(row, column, parent);
 	}
 
 	QModelIndex parent(const QModelIndex &index) const{
-		qDebug() << "parent called" << Qt::endl;
+		//qDebug() << "parent called: " << index << Qt::endl;
 		return KDirModel::parent(index);
 	}
 
 	int rowCount(const QModelIndex &parent = QModelIndex()) const{
 		int rc = KDirModel::rowCount(parent);
-		qDebug() << "rowCount called: " << rc << Qt::endl;
+		//qDebug() << "rowCount called: " << rc << ", " << parent<< Qt::endl;
 		return rc;
 	}
 
@@ -53,6 +54,16 @@ class DirTreeModel: public KDirModel{
 	public Q_SLOTS:
 	void dirUp();
 
+/*
+ * QQC1 TreeView is weird, appearantly the items cannot directly access the model via role names.
+ */
+	QVariant isDir(const QModelIndex &index) const{
+		return data(index, Roles::IsDirRole);
+	}
+	
+	QVariant urlForIndex(const QModelIndex &index) const{
+		return data(index, Roles::FileUrlRole);
+	}
 
 	Q_SIGNALS:
 	void urlChanged();

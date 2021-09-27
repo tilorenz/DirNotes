@@ -37,7 +37,6 @@ set(SRC_LIST
 	plugin/wdnplugin.cpp
 	plugin/docmodel.cpp
 	plugin/dirtreemodel.cpp
-	plugin/dirproxymodel.h
 	)
 
 find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED
@@ -58,7 +57,7 @@ add_custom_command(OUTPUT qmltypes
 	WORKING_DIRECTORY ${CMAKE_BUILD_DIR} )
 
 # add the executable
-add_library(${PROJECT_NAME} SHARED ${SRC_LIST} qmltypes)
+add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 
 target_link_libraries(${PROJECT_NAME}
 	Qt::Quick

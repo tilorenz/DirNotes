@@ -16,5 +16,5 @@ void WDNPlugin::registerTypes(const char *uri){
 
 
 
-//#include "wdnplugin.moc"
+#include "wdnplugin.moc"
 
