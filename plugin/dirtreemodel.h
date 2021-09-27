@@ -4,6 +4,7 @@
 #include <qabstractitemmodel.h>
 #include <qnamespace.h>
 #include <qqml.h>
+#include "stdlib.h"
 
 class DirTreeModel: public KDirModel{
 	Q_OBJECT
@@ -63,6 +64,21 @@ class DirTreeModel: public KDirModel{
 	
 	QVariant urlForIndex(const QModelIndex &index) const{
 		return data(index, Roles::FileUrlRole);
+	}
+
+	void openInFileMan(QUrl url){
+		//would using XDG portals directly via DBus be more efficient? perhaps.
+		system("xdg-open " + url.toString().toLatin1());
+	}
+
+	void openInFileMan(){
+		openInFileMan(m_url);
+	}
+
+	bool newFile(const QUrl &, QString);
+
+	bool newFile(QString name){
+		return newFile(m_url, name);
 	}
 
 	Q_SIGNALS:

@@ -60,3 +60,15 @@ void DirTreeModel::dirUp(){
 	KDirModel::openUrl(m_url);
 	Q_EMIT urlChanged();
 }
+
+
+	bool DirTreeModel::newFile(const QUrl &baseDir, QString name){
+		QString path(baseDir.path() + "/" + name);
+		QFile nFile(path);
+		if(! nFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::NewOnly))
+			return false;
+		nFile.close();
+		return true;
+	}
+
+

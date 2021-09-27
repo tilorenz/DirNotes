@@ -59,8 +59,7 @@ ColumnLayout{
 			Layout.alignment: Qt.AlignRight
 			icon.name: "document-new-symbolic"
 			focusPolicy: Qt.TabFocus
-			//TODO
-			//onClicked: notesPath = folderModel.parentFolder
+			onClicked: fnRow.expanded = ! fnRow.expanded
 			QQC.ToolTip{
 				text: "New Note"
 			}
@@ -71,17 +70,68 @@ ColumnLayout{
 			Layout.alignment: Qt.AlignRight
 			icon.name: "folder-open-symbolic"
 			focusPolicy: Qt.TabFocus
-			//TODO
-			//onClicked: notesPath = folderModel.parentFolder
+			onClicked: dtMod.openInFileMan()
 			QQC.ToolTip{
 				text: "Open folder in File Manager"
 			}
 		}
 	}
+
+	RowLayout{
+		id: fnRow
+		//Layout.maximumHeight: math.max(nfNameField.implicitHeight, nfAcceptBtn.implicitHeight)
+		Layout.preferredWidth: scrArea.width
+		Layout.minimumWidth: scrArea.width
+
+		property bool expanded: false
+		Layout.maximumHeight: expanded ? implicitHeight : 0
+		clip: true
+
+		Behavior on Layout.maximumHeight {
+			NumberAnimation{
+				duration: 200
+			}
+		}
+
+
+		PComp3.TextField{
+			id: nfNameField
+			placeholderText: "Filename.md..."
+		}
+
+		QQC.ToolButton{
+			id: nfAcceptBtn
+			icon.name: "dialog-ok"
+			focusPolicy: Qt.TabFocus
+			onClicked: {
+				dtMod.newFile(nfNameField.text)
+				fnRow.expanded = ! fnRow.expanded
+			}
+			QQC.ToolTip{
+				text: "Ok"
+			}
+		}
+
+		QQC.ToolButton{
+			id: nfCancelBtn
+			Layout.alignment: Qt.AlignRight
+			icon.name: "dialog-cancel"
+			focusPolicy: Qt.TabFocus
+			onClicked: fnRow.expanded = ! fnRow.expanded
+			QQC.ToolTip{
+				text: "Cancel"
+			}
+		}
+	}
+
+
+
+
 	QQC1.TreeView{
 		id: fileTree
 		model: prox
 		//Layout.fillWidth: true
+		Layout.maximumHeight: parent.height
 		Layout.fillHeight: true
 		implicitWidth: fileDelegate.implicitWidth
 
