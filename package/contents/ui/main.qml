@@ -7,7 +7,7 @@ import org.kde.kquickcontrolsaddons 2.0 as KQuickControlsAddonsComponents
 
 import com.github.tilorenz.wdnplugin 1.0 as WDNPlugin
 
-RowLayout {
+ColumnLayout {
 	id: root
 	Plasmoid.switchHeight: 2 * PlasmaCore.Units.gridUnit
 	Plasmoid.switchWidth: 4 * PlasmaCore.Units.gridUnit
@@ -29,25 +29,42 @@ RowLayout {
 		interval: 5000
 	}
 
+	RowLayout{
+		id: topBar
 
-	FileList{
-		id: fChooser
-		Layout.alignment: Qt.AlignLeft
-		Layout.fillWidth: true
-		Layout.fillHeight: true
-
+		PlasmaComponents.ToolButton{
+			id: dirUpBtn
+			Layout.alignment: Qt.AlignLeft
+			icon.name: fChooser.expanded ? "sidebar-collapse" : "sidebar-expand"
+			focusPolicy: Qt.TabFocus
+			onClicked: fChooser.expanded = ! fChooser.expanded
+			PlasmaComponents.ToolTip{
+				text: fChooser.expanded ? "Collapse Dir Tree" : "Expand Dir tree"
+			}
+		}
 	}
 
-	NoteArea{
-		id: nArea
-		Layout.alignment: Qt.AlignRight
-		//ta.text: "Main Area.\nFile:\n" + fChooser.currDoc 
-		ta.text: handler.text
-		ta.onEditingFinished: print("editing finished")
-		ta.onTextChanged: {
-			print("TA: text changed")
-			handler.text = ta.text
-			autoSaveTimer.restart()
+	RowLayout{
+
+		FileList{
+			id: fChooser
+			Layout.alignment: Qt.AlignLeft
+			Layout.fillWidth: true
+			Layout.fillHeight: true
+
+		}
+
+		NoteArea{
+			id: nArea
+			Layout.alignment: Qt.AlignRight
+			//ta.text: "Main Area.\nFile:\n" + fChooser.currDoc 
+			ta.text: handler.text
+			ta.onEditingFinished: print("editing finished")
+			ta.onTextChanged: {
+				print("TA: text changed")
+				handler.text = ta.text
+				autoSaveTimer.restart()
+			}
 		}
 	}
 

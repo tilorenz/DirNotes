@@ -16,10 +16,18 @@ import com.github.tilorenz.wdnplugin 1.0 as WDNPlugin
 
 ColumnLayout{
 	id: fSelect
-	Layout.fillWidth: true
 	Layout.fillHeight: true
-	implicitWidth: scrArea.implicitWidth
-	//anchors.fill: parent
+
+	property bool expanded: true
+	Layout.maximumWidth: expanded ? implicitWidth : 0
+	clip: true
+	Behavior on Layout.maximumWidth{
+		NumberAnimation{
+			duration: 200
+		}
+	}
+
+
 
 	property url notesPath: "file:///home/tino/projects/plasmoids/notes/testDir/"
 	//TODO: remember last used doc
@@ -40,8 +48,9 @@ ColumnLayout{
 	RowLayout{
 		id: ctrlButtonBar
 		Layout.maximumHeight: dirUpBtn.implicitHeight
-		Layout.preferredWidth: scrArea.width
-		Layout.minimumWidth: scrArea.width
+		Layout.preferredWidth: fileTree.width
+		Layout.minimumWidth: fileTree.width
+		Layout.maximumWidth: fileTree.width
 
 		QQC.ToolButton{
 			id: dirUpBtn
@@ -79,9 +88,8 @@ ColumnLayout{
 
 	RowLayout{
 		id: fnRow
-		//Layout.maximumHeight: math.max(nfNameField.implicitHeight, nfAcceptBtn.implicitHeight)
-		Layout.preferredWidth: scrArea.width
-		Layout.minimumWidth: scrArea.width
+		Layout.preferredWidth: fileTree.width
+		Layout.minimumWidth: fileTree.width
 
 		property bool expanded: false
 		Layout.maximumHeight: expanded ? implicitHeight : 0
@@ -130,7 +138,6 @@ ColumnLayout{
 	QQC1.TreeView{
 		id: fileTree
 		model: prox
-		//Layout.fillWidth: true
 		Layout.maximumHeight: parent.height
 		Layout.fillHeight: true
 		implicitWidth: fileDelegate.implicitWidth
