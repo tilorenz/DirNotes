@@ -16,7 +16,8 @@ ColumnLayout{
 	clip: true
 	Behavior on Layout.maximumWidth{
 		NumberAnimation{
-			duration: 200
+			duration: PCore.Units.shortDuration
+			easing.type: Easing.InOutQuad
 		}
 	}
 
@@ -90,7 +91,8 @@ ColumnLayout{
 
 		Behavior on Layout.maximumHeight {
 			NumberAnimation{
-				duration: 200
+				duration: PCore.Units.shortDuration
+				easing.type: Easing.InOutQuad
 			}
 		}
 
