@@ -5,6 +5,8 @@
 #include <qnamespace.h>
 #include <qqml.h>
 #include "stdlib.h"
+#include <QStandardPaths>
+#include <QDir>
 
 class DirTreeModel: public KDirModel{
 	Q_OBJECT
@@ -18,6 +20,17 @@ class DirTreeModel: public KDirModel{
 	}
 
 	void setUrl(QUrl url);
+
+	Q_INVOKABLE QString getPath() const {
+		return m_url.path();
+	}
+
+	Q_INVOKABLE void setPath(QString path){
+		if(m_url.path() == path)
+			return;
+		m_url.setPath(path);
+		Q_EMIT urlChanged();
+	}
 
 	enum Roles{
 		FileNameRole = Qt::DisplayRole,
@@ -85,7 +98,9 @@ class DirTreeModel: public KDirModel{
 	void urlChanged();
 
 	private:
-	QUrl m_url;
+	QUrl m_url = QUrl::fromLocalFile(
+			QStandardPaths::writableLocation(
+				QStandardPaths::GenericDataLocation) + QDir::separator() + "dir_notes");
 };
 #endif
 

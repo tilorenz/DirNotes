@@ -23,15 +23,28 @@ ColumnLayout{
 
 
 
-	property url notesPath: "file:///home/tino/projects/plasmoids/notes/testDir/"
+	property alias notesPath: dtMod.url
 	//TODO: remember last used doc
 	property url currDoc: ""
 
 	WDNPlugin.DirTreeModel{
 		id: dtMod
-		url: notesPath
-		onUrlChanged: notesPath = url
+		url: plasmoid.configuration.dirPath
+		// if the user clicks on a dir, it will be remembered in the config
+		onUrlChanged: {
+			var path = dtMod.getPath()
+			if(path != plasmoid.configuration.dirPath){
+				plasmoid.configuration.dirPath = path
+			}
+		}
 	}
+
+	Component.onCompleted: {
+		if(plasmoid.configuration.dirPath != ""){
+			dtMod.setPath(plasmoid.configuration.dirPath)
+		}
+	}
+
 	KItemModels.KSortFilterProxyModel{
 		id: prox
 		sourceModel: dtMod

@@ -1,15 +1,28 @@
 #include "dirtreemodel.h"
 #include <qobjectdefs.h>
 #include <KDirLister>
+#include <QStandardPaths>
+#include <QDir>
 
  void DirTreeModel::setUrl(QUrl url){
- 	 if(url == m_url)
- 	 	 return;
-      //qDebug() << "setUrl called: " << url << Qt::endl;
-	 m_url = url;
-	 KDirModel::openUrl(m_url);
-	 //beModel.dirLister()->openUrl(url, KDirLister::NoFlags);
- 	 Q_EMIT urlChanged();
+ 	if(url == m_url.path() && url.path() != "")
+ 		return;
+ 	// AppDataLocation gives the plasmashell path for plasmoids
+ 	QString stdPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    const QString suffix = QStringLiteral("dir_notes");
+
+ 	 // Calling with an empty URL resets to standard path.
+ 	if(url.path() == ""){
+		QDir(stdPath).mkdir(suffix);
+ 	 	if(m_url.path() == stdPath + QDir::separator() + suffix)
+ 	 	 	return;
+ 		m_url.setPath(stdPath + QDir::separator() + suffix);
+	} else{
+		m_url = url;
+	}
+
+	KDirModel::openUrl(m_url);
+ 	Q_EMIT urlChanged();
  }
 
 
@@ -39,24 +52,13 @@ QVariant DirTreeModel::data(const QModelIndex &index, int role) const{
 
 
 void DirTreeModel::dirUp(){
-	//qDebug() << "dirUp called. path: " << m_url.path() 
-		//<< ", url: " << m_url << Qt::endl;
-	QString path = m_url.path();
-	if(path == "/" || path.isEmpty()){
+	QDir dir(m_url.path());
+	if(! dir.cdUp()){
+		qDebug() << "Couldn't go to parent dir." << Qt::endl;
 		return;
 	}
-	//qDebug() << "Path before chopping: " << path << Qt::endl;
 
-	while(path.back() == '/'){
-		path.chop(1);
-	}
-	// "ab/de" -> lastIndex is 2
-	int newLen = path.lastIndexOf("/");
-	//qDebug() << "Path before truncating: " << path << Qt::endl;
-	path.truncate(newLen);
-	//qDebug() << "Path after truncating: " << path << Qt::endl;
-
-	m_url.setPath(path);
+	m_url.setPath(dir.path());
 	KDirModel::openUrl(m_url);
 	Q_EMIT urlChanged();
 }
