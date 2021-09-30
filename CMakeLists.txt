@@ -5,8 +5,8 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
    message(FATAL_ERROR "plasma requires an out of source build. Please create a separate build directory and run 'cmake path_to_plasma [options]' there.")
 endif()
 
-set(PROJECT_VERSION "5.22.80")
-set(PROJECT_VERSION_MAJOR 5)
+set(PROJECT_VERSION "1.0")
+set(PROJECT_VERSION_MAJOR 1)
 
 set(QT_MIN_VERSION 5.15.0)
 set(KF5_MIN_VERSION 5.79.0)
@@ -28,11 +28,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 
-#TODO remove maybe
-#include(GenerateExportHeader)
-#include(CMakePackageConfigHelpers)
-
-
 set(SRC_LIST
 	plugin/wdnplugin.cpp
 	plugin/docmodel.cpp
@@ -48,8 +43,6 @@ find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED
 find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS
 	KIO
 	)
-
-#add_definitions(-DTRANSLATION_DOMAIN="com.github.tilorenz.wdnplugin")
 
 set_source_files_properties( qmltypes PROPERTIES GENERATED true)
 add_custom_command(OUTPUT qmltypes
