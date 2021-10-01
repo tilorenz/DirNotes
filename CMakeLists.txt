@@ -60,6 +60,6 @@ target_link_libraries(${PROJECT_NAME}
 ### PACKAGE
 #plasma_install_package(package com.github.tilorenz.webdavnotes)
 
-install(TARGETS wdnplugin DESTINATION /usr/lib/qt/qml/com/github/tilorenz/wdnplugin)
-install(FILES plugin/qmldir DESTINATION /usr/lib/qt/qml/com/github/tilorenz/wdnplugin)
-install(FILES build/plugins.qmltypes DESTINATION /usr/lib/qt/qml/com/github/tilorenz/wdnplugin)
+install(TARGETS wdnplugin DESTINATION ${KDE_INSTALL_QMLDIR}/com/github/tilorenz/wdnplugin)
+install(FILES plugin/qmldir DESTINATION ${KDE_INSTALL_QMLDIR}/com/github/tilorenz/wdnplugin)
+install(FILES build/plugins.qmltypes DESTINATION ${KDE_INSTALL_QMLDIR}/com/github/tilorenz/wdnplugin)
