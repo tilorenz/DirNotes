@@ -15,6 +15,12 @@ class DirTreeModel: public KDirModel{
 
 	public:
 
+	DirTreeModel(QObject *parent = nullptr) : 
+		KDirModel(parent)
+	{
+		KDirModel::openUrl(m_url);
+	}
+
 	QUrl url() const {
 		return m_url;
 	}
@@ -29,6 +35,7 @@ class DirTreeModel: public KDirModel{
 		if(m_url.path() == path)
 			return;
 		m_url.setPath(path);
+		KDirModel::openUrl(m_url);
 		Q_EMIT urlChanged();
 	}
 
