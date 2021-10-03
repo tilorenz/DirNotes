@@ -50,6 +50,7 @@ ColumnLayout{
 		sourceModel: dtMod
 		sortRole: "fileName"
 		sortOrder: Qt.AscendingOrder
+		sortCaseSensitivity: Qt.CaseInsensitive
 	}
 
 	RowLayout{
