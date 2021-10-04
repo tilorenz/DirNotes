@@ -3,14 +3,6 @@
 #include <QDebug>
 
 
-QString DocModel::text() const{
-	return m_text;
-}
-
-QUrl DocModel::url() const{
-	return m_url;
-}
-
 void DocModel::setText(QString str){
 	if(str == m_text)
 		return;
@@ -18,44 +10,49 @@ void DocModel::setText(QString str){
 	Q_EMIT textChanged();
 }
 
-void DocModel::loadDoc(QUrl url){
-	if(url == m_url)
+
+void DocModel::setActive(bool active){
+	if(m_active == active)
+		return;
+	m_active = active;
+	Q_EMIT activeChanged();
+}
+
+
+void DocModel::loadDoc(QUrl url, bool forceReload){
+	if(url == m_url && ! forceReload)
 		return;
 	if(!url.isValid()){
 		qDebug() << "URL " << url << " is invalid." <<Qt::endl;
 		return;
 	}
 
-	if(m_url.isValid()){
+	// save any changes to the previous document before opening a new one
+	if(m_url.isValid() && ! forceReload){
 		save();
 	}
 
 	m_url = url;
-#if 1
 	QFile doc(url.path());
-#else
-	QFile doc("metadata.desktop");
-#endif
 
 	if(! doc.open(QIODevice::ReadOnly | QIODevice::Text | QIODevice::ExistingOnly)){
-		qDebug() << "Couldn't open file" << url.path() << Qt::endl;
-		qDebug() << doc.fileName();
-		qDebug() << doc.size();
-		qDebug() << doc.exists();
-		qDebug() << doc.isReadable();
-		doc.dumpObjectInfo();
+		qDebug() << "Couldn't open file" << url.path();
 		m_text = "Couldn't open file\n" + url.path();
 		Q_EMIT urlChanged();
 		Q_EMIT textChanged();
 		return;
 	}
 
+	// handle file watcher
+	m_watcher.removePaths(m_watcher.files());
+	m_watcher.addPath(m_url.path());
+
 	m_text = doc.readAll();
 	doc.close();
 	Q_EMIT urlChanged();
 	Q_EMIT textChanged();
 }
-//
+
 
 bool DocModel::save(){
 	if(!m_url.isValid()){
@@ -72,14 +69,34 @@ bool DocModel::save(){
 
 	qDebug() << "Writing to file " << m_url.path() << Qt::endl;
 
+	// unwatch file while writing to it...
+	m_watcher.removePath(m_url.path());
+
 	QTextStream out(&doc);
 	out << m_text;
 	out.flush();
 	doc.close();
+
+	// ...and resume watching once it's done
+	m_watcher.addPath(m_url.path());
 	return true;
 }
 
 
+void DocModel::handleFileChanged(){
+	qDebug() << "File changed on disk.";
+
+	if(m_active){
+		// save file to /tmp and set current file there (so the user can finish typing)
+		// emit fileChanged
+	} else{
+		// reload
+		loadDoc(m_url, true);
+	}
+}
+
+
 DocModel::~DocModel(){
+	qDebug() << "Destructor called.";
 	save();
 }
