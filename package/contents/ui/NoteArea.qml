@@ -49,7 +49,31 @@ ColumnLayout{
 				docModel.text = ta.text
 				autoSaveTimer.restart()
 			}
+		}
+	}
 
+	GridLayout{
+		id: fileChangedRow
+
+		property bool expanded: false
+		Layout.maximumHeight: expanded ? implicitHeight : 0
+		Behavior on Layout.maximumHeight {
+			NumberAnimation {
+				duration: PlasmaCore.Units.shortDuration
+				easing.type: Easing.InOutQuad
+			}
+		}
+		clip: true
+
+		PlasmaComponents.Label{
+			text: "File changed on disk. Saving to ..."
+		}
+
+		PlasmaComponents.Button{
+			text: "Ok"
+			onClicked: {
+				fileChangedRow.expanded = false
+			}
 		}
 	}
 }
