@@ -1,6 +1,9 @@
 #include "docmodel.h"
 #include <QFile>
 #include <QDebug>
+#include <QStandardPaths>
+#include <QDir>
+#include <QDateTime>
 
 
 void DocModel::setText(QString str){
@@ -83,12 +86,51 @@ bool DocModel::save(){
 }
 
 
+/**
+ * Writes the current text to a backup path and sets the current file there.
+ *
+ * @return The save path.
+ */
+QString DocModel::saveToBackup(){
+ 	const QString basePath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    const QString suffix = QStringLiteral("dir_notes_backup");
+    QDir(basePath).mkdir(suffix);
+
+    QString baseFileName = m_url.fileName();
+	QString timeStamp = QDateTime::currentDateTime().toString(".yyMMdd_hhmmss");
+
+	QString path = basePath + QDir::separator() + suffix + QDir::separator()
+		+ baseFileName + timeStamp;
+	QFile doc(path);
+
+	if(! doc.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::NewOnly)){
+		qDebug() << "Couldn't open file" << path;
+		return "";
+	}
+
+	QTextStream out(&doc);
+	out << m_text;
+	out.flush();
+	doc.close();
+
+	m_url.setPath(path);
+	m_watcher.removePaths(m_watcher.files());
+	// maybe someone gets the idea to change the backup file in another editor too...
+	// you never know
+	m_watcher.addPath(path);
+	Q_EMIT urlChanged();
+	return path;
+}
+
+
 void DocModel::handleFileChanged(){
 	qDebug() << "File changed on disk.";
 
 	if(m_active){
-		// save file to /tmp and set current file there (so the user can finish typing)
+		// save file to backup path and set current file there (so the user can finish typing)
 		// emit fileChanged
+		QString path = saveToBackup();
+		Q_EMIT fileChanged(path);
 	} else{
 		// reload
 		loadDoc(m_url, true);

@@ -60,6 +60,8 @@ class DocModel : public QObject{
 	QUrl m_url;
 	QFileSystemWatcher m_watcher;
 	bool m_active = false;
+
+	QString saveToBackup();
 };
 #endif
 

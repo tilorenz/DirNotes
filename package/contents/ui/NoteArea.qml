@@ -24,9 +24,10 @@ ColumnLayout{
 		onTriggered: {
 			print("Autosaving after stopped typing")
 			docModel.save()
+			docModel.active = false
 		}
 		//TODO shorter time for testing, use 20s or so for production
-		interval: 5000
+		interval: 10000
 	}
 
 
@@ -47,9 +48,14 @@ ColumnLayout{
 			onTextChanged: {
 				print("TA: text changed")
 				docModel.text = ta.text
+				docModel.active = true
 				autoSaveTimer.restart()
 			}
 		}
+	}
+
+	Component.onCompleted: {
+		docModel.fileChanged.connect(fileChangedRow.expand)
 	}
 
 	GridLayout{
@@ -65,8 +71,15 @@ ColumnLayout{
 		}
 		clip: true
 
+		property string savePath
+		function expand(path){
+			fileChangedRow.savePath = path
+			fileChangedRow.expanded = true
+		}
+
 		PlasmaComponents.Label{
-			text: "File changed on disk. Saving to ..."
+			id: fcLabel
+			text: "File changed on disk. Saving to " + fileChangedRow.savePath
 		}
 
 		PlasmaComponents.Button{
