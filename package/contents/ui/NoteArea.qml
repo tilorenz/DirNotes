@@ -48,6 +48,13 @@ ColumnLayout{
 			//text: "Main Area.\nFile:\n" + fChooser.currDoc 
 
 			onTextChanged: {
+				// if the text change was caused by the model loading a new text,
+				// there is no need to save it and set active
+				if(docModel.textSetFromModel){
+					docModel.textSetFromModel = false
+					return
+				}
+
 				print("TA: text changed")
 				docModel.text = ta.text
 				docModel.active = true

@@ -21,6 +21,13 @@ void DocModel::setActive(bool active){
 	Q_EMIT activeChanged();
 }
 
+void DocModel::setTSFM(bool tsfm){
+	if(m_textSetFromModel == tsfm)
+		return;
+	m_textSetFromModel = tsfm;
+	Q_EMIT textSetFromModelChanged();
+}
+
 
 void DocModel::loadDoc(QUrl url, bool forceReload){
 	if(url == m_url && ! forceReload)
@@ -41,6 +48,7 @@ void DocModel::loadDoc(QUrl url, bool forceReload){
 	if(! doc.open(QIODevice::ReadOnly | QIODevice::Text | QIODevice::ExistingOnly)){
 		qDebug() << "Couldn't open file" << url.path();
 		m_text = "Couldn't open file\n" + url.path();
+		setTSFM(true);
 		Q_EMIT urlChanged();
 		Q_EMIT textChanged();
 		return;
@@ -51,6 +59,7 @@ void DocModel::loadDoc(QUrl url, bool forceReload){
 	m_watcher.addPath(m_url.path());
 
 	m_text = doc.readAll();
+	setTSFM(true);
 	doc.close();
 	Q_EMIT urlChanged();
 	Q_EMIT textChanged();
