@@ -15,11 +15,14 @@ ColumnLayout {
 		(plasmoid.formFactor === PlasmaCore.Types.Vertical 
 		|| plasmoid.formFactor === PlasmaCore.Types.Horizontal))
 
-	Layout.maximumWidth: fixedSize ? 30 * PlasmaCore.Units.gridUnit : Infinity
-	Layout.maximumHeight: fixedSize ? 30 * PlasmaCore.Units.gridUnit : Infinity
-	Layout.minimumWidth: (fixedSize ? 30 : 1) * PlasmaCore.Units.gridUnit
-	Layout.minimumHeight: (fixedSize ? 30 : 1) * PlasmaCore.Units.gridUnit
-
+	Layout.maximumWidth: fixedSize ?  (30 * PlasmaCore.Units.gridUnit) : 10000
+	Layout.maximumHeight: fixedSize ? (30 * PlasmaCore.Units.gridUnit) : 10000
+	Layout.minimumWidth: fixedSize ?  (30 * PlasmaCore.Units.gridUnit) : 30
+	Layout.minimumHeight: fixedSize ? (30 * PlasmaCore.Units.gridUnit) : 30
+	//Layout.maximumWidth: 30 * PCore.Units.gridUnit
+	//Layout.maximumHeight:30 * PCore.Units.gridUnit
+	//Layout.minimumWidth: 30 * PCore.Units.gridUnit
+	//Layout.minimumHeight:30 * PCore.Units.gridUnit
 	//onFixedSizeChanged: print("Fixed size: ", fixedSize)
 
 	//Component.onCompleted: {

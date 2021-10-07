@@ -147,7 +147,6 @@ ColumnLayout{
 	QQC1.TreeView{
 		id: fileTree
 		model: prox
-		Layout.maximumHeight: parent.height
 		Layout.fillHeight: true
 		implicitWidth: fileDelegate.implicitWidth
 
