@@ -31,6 +31,7 @@ QHash<int, QByteArray> DirTreeModel::roleNames() const {
     roles[FileNameRole] = "fileName";
     roles[FileUrlRole] = "fileUrl";
     roles[IsDirRole] = "isDir";
+    roles[DisplayRole] = "display";
     return roles;
 }
 
@@ -45,6 +46,10 @@ QVariant DirTreeModel::data(const QModelIndex &index, int role) const{
 			return item.isDir();
 		case FileUrlRole:
 			return item.url();
+		case DisplayRole:
+			return KDirModel::data(index, Qt::DisplayRole);
+		default:
+			qDebug() << "Requested role: " << role << " for index " << index;
 	}
 	return KDirModel::data(index, role);
 }

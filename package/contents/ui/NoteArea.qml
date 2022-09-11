@@ -1,6 +1,6 @@
 import QtQuick 2.6
 import QtQuick.Layouts 1.1
-import QtQuick.Controls 2.0 as QQC
+import QtQuick.Controls 2.15 as QQC
 import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 3.0 as PlasmaComponents 
 import org.kde.plasma.extras 2.0 as PlasmaExtras
@@ -32,36 +32,70 @@ ColumnLayout{
 		interval: 10000
 	}
 
-
-	PlasmaComponents.ScrollView{
-		id: txtScroll
-
+	// this is needed so we can keep the sidebarToggleBtn above the textfield
+	// and anchored to the bottom of the plasmoid (without it scrolling with the text)
+	Item{
+		id: taContainer
 		Layout.fillWidth: true
 		Layout.fillHeight: true
-		clip: true
 
-		PlasmaComponents.TextArea{
-			id: mainTextArea
-			Layout.fillWidth: true
-			Layout.fillHeight: true
-			text: docModel.text
-			//text: "Main Area.\nFile:\n" + fChooser.currDoc 
+		PlasmaComponents.ScrollView{
+			id: txtScroll
+			anchors.fill: parent
+			//Layout.fillWidth: true
+			//Layout.fillHeight: true
+			clip: true
 
-			onTextChanged: {
-				// if the text change was caused by the model loading a new text,
-				// there is no need to save it and set active
-				if(docModel.textSetFromModel){
-					docModel.textSetFromModel = false
-					return
+			PlasmaComponents.TextArea{
+				id: mainTextArea
+				Layout.fillWidth: true
+				Layout.fillHeight: true
+				text: docModel.text
+				//text: "Main Area.\nFile:\n" + fChooser.currDoc 
+
+				onTextChanged: {
+					// if the text change was caused by the model loading a new text,
+					// there is no need to save it and set active
+					if(docModel.textSetFromModel){
+						docModel.textSetFromModel = false
+						return
+					}
+
+					print("TA: text changed")
+					docModel.text = ta.text
+					docModel.active = true
+					autoSaveTimer.restart()
 				}
 
-				print("TA: text changed")
-				docModel.text = ta.text
-				docModel.active = true
-				autoSaveTimer.restart()
+				property point bottomPoint: mapToGlobal(0, mainTextArea.y + mainTextArea.height)
+
+			}
+		}
+
+		// the button toggling the sidebar with the directory tree
+		PlasmaComponents.ToolButton{
+			id: sidebarToggleBtn
+			anchors.left: parent.left
+			anchors.bottom: parent.bottom
+			//visible: mainTextArea.hovered || sidebarToggleBtn.hovered
+			 ////IDK if the animation really makes it better; will have to get feedback
+			visible: opacity > 0
+			opacity: mainTextArea.hovered || sidebarToggleBtn.hovered
+			Behavior on opacity{
+				NumberAnimation{
+					duration: PlasmaCore.Units.longDuration
+					easing.type: Easing.OutQuad
+				}
+			}
+			icon.name: fChooser.expanded ? "sidebar-collapse" : "sidebar-expand"
+			focusPolicy: Qt.TabFocus
+			onClicked: fChooser.expanded = ! fChooser.expanded
+			PlasmaComponents.ToolTip{
+				text: fChooser.expanded ? "Collapse Dir Tree" : "Expand Dir tree"
 			}
 		}
 	}
+
 
 	Component.onCompleted: {
 		docModel.fileChanged.connect(fileChangedRow.expand)

@@ -43,6 +43,7 @@ class DirTreeModel: public KDirModel{
 		FileNameRole = Qt::DisplayRole,
 		FileUrlRole,
 		IsDirRole,
+		DisplayRole
 	};
 	
 	QHash<int, QByteArray> roleNames() const;
@@ -50,7 +51,8 @@ class DirTreeModel: public KDirModel{
 
 	int columnCount(const QModelIndex &parent = QModelIndex()) const{
 		//qDebug() << "columnCount called: " << parent << Qt::endl;
-		return KDirModel::columnCount(parent);
+		//return KDirModel::columnCount(parent);
+		return 1;
 	}
 
 	QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const{
