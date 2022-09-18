@@ -10,6 +10,10 @@
 		<label>Directory Path</label>
 		<default></default>
 	</entry>
+	<entry name="lastFile" type="Path">
+		<label>Last open file</label>
+		<default>file:///home/tino/Stuff/New Note.md</default>
+	</entry>
 </group>
 
 </kcfg>

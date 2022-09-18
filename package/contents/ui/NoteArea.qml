@@ -4,6 +4,7 @@ import QtQuick.Controls 2.15 as QQC
 import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 3.0 as PlasmaComponents 
 import org.kde.plasma.extras 2.0 as PlasmaExtras
+import org.kde.plasma.plasmoid 2.0
 
 import com.github.tilorenz.wdnplugin 1.0 as WDNPlugin
 
@@ -11,7 +12,7 @@ import com.github.tilorenz.wdnplugin 1.0 as WDNPlugin
 ColumnLayout{
 	id: nField
 	property alias ta: mainTextArea
-	property var currDoc: ""
+	property var currDoc: plasmoid.configuration.lastFile
 	Layout.fillWidth: true
 	Layout.fillHeight: true
 
@@ -61,14 +62,11 @@ ColumnLayout{
 						return
 					}
 
-					print("TA: text changed")
+					//print("TA: text changed")
 					docModel.text = ta.text
 					docModel.active = true
 					autoSaveTimer.restart()
 				}
-
-				property point bottomPoint: mapToGlobal(0, mainTextArea.y + mainTextArea.height)
-
 			}
 		}
 
