@@ -17,11 +17,16 @@ Item {
 		Layout.preferredWidth: PlasmaCore.Units.gridUnit * 24
 		Layout.preferredHeight: PlasmaCore.Units.gridUnit * 24
 
+		property var currDoc: plasmoid.configuration.lastFile || (fChooser.notesPath + '/New Note.md')
+
 		FileList{
 			id: fChooser
 			Layout.alignment: Qt.AlignLeft
-			//Layout.fillWidth: true
-			//Layout.fillHeight: true
+			currDoc: mainRow.currDoc
+			onCurrDocChanged: {
+				mainRow.currDoc = currDoc
+				nArea.currDoc = currDoc
+			}
 		}
 
 		NoteArea{
@@ -29,7 +34,12 @@ Item {
 			Layout.alignment: Qt.AlignRight
 			Layout.fillWidth: true
 			Layout.fillHeight: true
-			currDoc: fChooser.currDoc
+			currDoc: mainRow.currDoc
+			onCurrDocChanged: {
+				mainRow.currDoc = currDoc
+				fChooser.currDoc = currDoc
+			}
 		}
 	}
 }
+

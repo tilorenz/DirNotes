@@ -10,22 +10,22 @@ import com.github.tilorenz.wdnplugin 1.0 as WDNPlugin
 
 
 ColumnLayout{
-	id: nField
-	property alias ta: mainTextArea
-	property var currDoc: plasmoid.configuration.lastFile
+	id: nArea
 	Layout.fillWidth: true
 	Layout.fillHeight: true
 
+	property alias ta: mainTextArea
+	property var currDoc: ""
 
 	WDNPlugin.DocModel{
 		id: docModel
-		url: nField.currDoc
+		url: nArea.currDoc
 	}
 
 	Timer{
 		id: autoSaveTimer
 		onTriggered: {
-			print("Autosaving after stopped typing")
+			//print("Autosaving after stopped typing")
 			docModel.save()
 			docModel.active = false
 		}

@@ -9,7 +9,7 @@ import org.kde.kirigamiaddons.treeview 1.0 as TreeView
 import com.github.tilorenz.wdnplugin 1.0 as WDNPlugin
 
 ColumnLayout{
-	id: fSelect
+	id: fChooser
 	Layout.fillHeight: true
 	width: expanded ? expWidth : 0
 	implicitWidth: expanded ? expWidth : 0
@@ -73,7 +73,16 @@ ColumnLayout{
 		Layout.fillWidth: true
 		Layout.fillHeight: true
 
+		Timer{
+			id: indexSetter
+			interval: 200
+			property int index: -1
+			onTriggered: fileTree.currentIndex = index
+		}
+
 		model: sortMod
+		// don't automatically highlight/select the first item
+		currentIndex: -1
 
 		delegate: TreeView.BasicTreeItem{
 			id: tlvDelegate
@@ -89,6 +98,18 @@ ColumnLayout{
 				// open the document
 				print('fileUrl:', fileUrl)
 				fChooser.currDoc = fileUrl
+			}
+
+			// Setting the index directly doesn't work: it seems when the delegate is added,
+			// the view isn't ready to have currentIndex set.
+			// Maybe it'll work properly in some future Qt version.
+			// And no, Component.onCompleted doesn't work either.
+			// So we just wait 200ms and hope nothing else happens during that time.
+			ListView.onAdd: {
+				if(fileUrl == fChooser.currDoc){
+					indexSetter.index = index
+					indexSetter.start()
+				}
 			}
 		}
 	}

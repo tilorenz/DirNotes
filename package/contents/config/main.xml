@@ -12,7 +12,7 @@
 	</entry>
 	<entry name="lastFile" type="Path">
 		<label>Last open file</label>
-		<default>file:///home/tino/Stuff/New Note.md</default>
+		<default></default>
 	</entry>
 </group>
 

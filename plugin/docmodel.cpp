@@ -38,7 +38,8 @@ void DocModel::loadDoc(QUrl url, bool forceReload){
 	}
 
 	// save any changes to the previous document before opening a new one
-	if(m_url.isValid() && ! forceReload){
+	if(! forceReload){
+		//qDebug() << "Saving changes to" << m_url.path() << " before loading " << url.path();
 		save();
 	}
 
@@ -47,7 +48,7 @@ void DocModel::loadDoc(QUrl url, bool forceReload){
 
 	if(! doc.open(QIODevice::ReadOnly | QIODevice::Text | QIODevice::ExistingOnly)){
 		qDebug() << "Couldn't open file" << url.path();
-		m_text = "Couldn't open file\n" + url.path();
+		//m_text = "Couldn't open file\n" + url.path();
 		setTSFM(true);
 		Q_EMIT urlChanged();
 		Q_EMIT textChanged();
@@ -74,12 +75,17 @@ bool DocModel::save(){
 
 	QFile doc(m_url.path());
 
-	if(! doc.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text | QIODevice::ExistingOnly)){
-		qDebug() << "Couldn't open file" << m_url << Qt::endl;
+	// no point making a new file to save, well, nothing
+	if(! doc.exists() && m_text.isEmpty()){
 		return false;
 	}
 
-	qDebug() << "Writing to file " << m_url.path() << Qt::endl;
+	if(! doc.open(QIODevice::WriteOnly | QIODevice::Text)){
+		qDebug() << "Couldn't open file" << m_url.path();
+		return false;
+	}
+
+	qDebug() << "Writing to file " << m_url.path();
 
 	// unwatch file while writing to it...
 	m_watcher.removePath(m_url.path());
