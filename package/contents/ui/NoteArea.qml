@@ -5,6 +5,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 3.0 as PlasmaComponents 
 import org.kde.plasma.extras 2.0 as PlasmaExtras
 import org.kde.plasma.plasmoid 2.0
+import org.kde.kirigami 2.4 as Kirigami
 
 import com.github.tilorenz.wdnplugin 1.0 as WDNPlugin
 
@@ -78,7 +79,8 @@ ColumnLayout{
 			//visible: mainTextArea.hovered || sidebarToggleBtn.hovered
 			 ////IDK if the animation really makes it better; will have to get feedback
 			visible: opacity > 0
-			opacity: mainTextArea.hovered || sidebarToggleBtn.hovered
+			// TODO find a way to test this (simulate a touch device)
+			opacity: mainTextArea.hovered || sidebarToggleBtn.hovered || Kirigami.Settings.tabletModeAvailable
 			Behavior on opacity{
 				NumberAnimation{
 					duration: PlasmaCore.Units.longDuration
