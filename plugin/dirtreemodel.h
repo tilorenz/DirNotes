@@ -90,7 +90,8 @@ class DirTreeModel: public KDirModel{
 
 	void openInFileMan(QUrl url){
 		//would using XDG portals directly via DBus be more efficient? perhaps.
-		system("xdg-open " + url.toString().toLatin1());
+		// should I escape the string properly for shell? perhaps.
+		system("xdg-open \"" + url.toString().toLatin1().replace("\"", "\\\"") + "\"");
 	}
 
 	void openInFileMan(){

@@ -5,6 +5,7 @@ import org.kde.plasma.components 3.0 as PComp3
 import org.kde.plasma.plasmoid 2.0
 import org.kde.kitemmodels 1.0 as KItemModels
 import org.kde.kirigamiaddons.treeview 1.0 as TreeView
+import QtQuick.Controls 2.15
 
 import com.github.tilorenz.wdnplugin 1.0 as WDNPlugin
 
@@ -73,42 +74,65 @@ ColumnLayout{
 		Layout.fillWidth: true
 		Layout.fillHeight: true
 
-		Timer{
-			id: indexSetter
-			interval: 200
-			property int index: -1
-			onTriggered: fileTree.currentIndex = index
-		}
-
 		model: sortMod
 		// don't automatically highlight/select the first item
 		currentIndex: -1
 
-		delegate: TreeView.BasicTreeItem{
-			id: tlvDelegate
-			label: model.display
-			width: fChooser.width
-			implicitWidth: fChooser.width
-			reserveSpaceForIcon: false
+		delegate: TreeView.AbstractTreeItem{
+			id: listItem
+			Layout.fillWidth: true
 
-			onClicked: if(isDir){
-				// set as root dir
-				dtMod.url = fileUrl
-			} else{
-				// open the document
-				print('fileUrl:', fileUrl)
-				fChooser.currDoc = fileUrl
-			}
+			contentItem: Label {
+				id: labelItem
+				text: model.display
+				Layout.fillWidth: true
+				color: (highlighted || (pressed && supportsMouseEvents)) ? 
+				listItem.activeTextColor : listItem.textColor
+				elide: Text.ElideRight
+				opacity: 1
 
-			// Setting the index directly doesn't work: it seems when the delegate is added,
-			// the view isn't ready to have currentIndex set.
-			// Maybe it'll work properly in some future Qt version.
-			// And no, Component.onCompleted doesn't work either.
-			// So we just wait 200ms and hope nothing else happens during that time.
-			ListView.onAdd: {
-				if(fileUrl == fChooser.currDoc){
-					indexSetter.index = index
-					indexSetter.start()
+				PComp3.Menu{
+					id: contextMenu
+					PComp3.MenuItem{
+						text: "Rename"
+					}
+					PComp3.MenuItem{
+						text: "New File"
+					}
+					PComp3.MenuItem{
+						text: "Delete"
+					}
+					PComp3.MenuItem{
+						text: "Open in external program"
+						onClicked: dtMod.openInFileMan(fileUrl)
+					}
+				}
+
+				PCore.ToolTipArea{
+					anchors.fill: parent
+					mainText: model.display
+					icon: isDir ? "folder" :
+					(model.display.endsWith(".md") ? "text-markdown" : "text-plain")
+				}
+
+				MouseArea{
+					anchors.fill: parent
+					acceptedButtons: Qt.LeftButton | Qt.RightButton
+					onClicked: {
+						if(mouse.button === Qt.LeftButton){
+							if(isDir){
+								// set as root dir
+								dtMod.url = fileUrl
+								fileTree.currentIndex = -1
+							} else{
+								// open the document
+								fileTree.currentIndex = index
+								fChooser.currDoc = fileUrl
+							}
+						} else if(mouse.button === Qt.RightButton){
+							contextMenu.popup()
+						}
+					}
 				}
 			}
 		}
