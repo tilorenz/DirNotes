@@ -1,6 +1,7 @@
 import QtQuick 2.6 
 import QtQuick.Layouts 1.1
 import org.kde.plasma.core 2.0 as PCore
+import org.kde.plasma.components 2.0 as PComp2
 import org.kde.plasma.components 3.0 as PComp3
 import org.kde.plasma.plasmoid 2.0
 import org.kde.kitemmodels 1.0 as KItemModels
@@ -67,6 +68,29 @@ ColumnLayout{
 		sortCaseSensitivity: Qt.CaseInsensitive
 	}
 
+	Dialog{
+		id: nameDialog
+		standardButtons: Dialog.Ok | Dialog.Cancel
+		modal: true
+		property var createFun: null
+		property url baseUrl: ""
+		property alias defaultText: nameTextField.text
+
+		contentItem: ColumnLayout{
+			PComp3.Label{
+				text: "Enter name:"
+			}
+			PComp3.TextField{
+				id: nameTextField
+				text: "FileName.md"
+			}
+		}
+		onAccepted: {
+			createFun(baseUrl, nameTextField.text)
+			nameTextField.text = ""
+		}
+	}
+
 
 	TreeView.TreeListView {
 		id: fileTree
@@ -77,6 +101,41 @@ ColumnLayout{
 		model: sortMod
 		// don't automatically highlight/select the first item
 		currentIndex: -1
+
+		MouseArea{
+			anchors.fill: parent
+			acceptedButtons: Qt.RightButton
+			z: -100
+			onClicked: {
+				viewMenu.popup()
+			}
+		}
+
+		PComp3.Menu{
+			id: viewMenu
+			PComp3.MenuItem{
+				text: "New note"
+				onClicked: {
+					nameDialog.baseUrl = dtMod.url
+					nameDialog.createFun = dtMod.newFile
+					nameDialog.defaultText = "FileName.md"
+					nameDialog.open()
+				}
+			}
+			PComp3.MenuItem{
+				text: "New directory"
+				onClicked: {
+					nameDialog.baseUrl = dtMod.url
+					nameDialog.createFun = dtMod.newDir
+					nameDialog.defaultText = "NewDir"
+					nameDialog.open()
+				}
+			}
+			PComp3.MenuItem{
+				text: "Open in external program"
+				onClicked: dtMod.openInFileMan()
+			}
+		}
 
 		delegate: TreeView.AbstractTreeItem{
 			id: listItem
@@ -92,12 +151,39 @@ ColumnLayout{
 				opacity: 1
 
 				PComp3.Menu{
-					id: contextMenu
+					id: delegateMenu
 					PComp3.MenuItem{
 						text: "Rename"
 					}
 					PComp3.MenuItem{
-						text: "New File"
+						text: "New note"
+						onClicked: {
+							nameDialog.createFun = dtMod.newFile
+							nameDialog.defaultText = "FileName.md"
+							// if the user clicked on a directory, make a new file inside.
+							// else, make a new file next to the file the user clicked.
+							if(isDir){
+								nameDialog.baseUrl = fileUrl
+							} else{
+								nameDialog.baseUrl = parentUrl
+							}
+							nameDialog.open()
+						}
+					}
+					PComp3.MenuItem{
+						text: "New directory"
+						onClicked: {
+							nameDialog.createFun = dtMod.newDir
+							nameDialog.defaultText = "NewDir"
+							// if the user clicked on a directory, make a new directory inside.
+							// else, make a new directory next to the file the user clicked.
+							if(isDir){
+								nameDialog.baseUrl = fileUrl
+							} else{
+								nameDialog.baseUrl = parentUrl
+							}
+							nameDialog.open()
+						}
 					}
 					PComp3.MenuItem{
 						text: "Delete"
@@ -130,7 +216,7 @@ ColumnLayout{
 								fChooser.currDoc = fileUrl
 							}
 						} else if(mouse.button === Qt.RightButton){
-							contextMenu.popup()
+							delegateMenu.popup()
 						}
 					}
 				}

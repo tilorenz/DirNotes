@@ -32,6 +32,7 @@ QHash<int, QByteArray> DirTreeModel::roleNames() const {
     roles[FileUrlRole] = "fileUrl";
     roles[IsDirRole] = "isDir";
     roles[DisplayRole] = "display";
+    roles[ParentUrlRole] = "parentUrl";
     return roles;
 }
 
@@ -48,6 +49,12 @@ QVariant DirTreeModel::data(const QModelIndex &index, int role) const{
 			return item.url();
 		case DisplayRole:
 			return KDirModel::data(index, Qt::DisplayRole);
+		case ParentUrlRole:{
+							   const KFileItem parentItem = qvariant_cast<KFileItem>(
+									   KDirModel::data(index.parent(), KDirModel::FileItemRole));
+							   qDebug() << "parent item: " << parentItem.url();
+							   return parentItem.url();
+						   }
 		default:
 			qDebug() << "Requested role: " << role << " for index " << index;
 	}
@@ -69,13 +76,37 @@ void DirTreeModel::dirUp(){
 }
 
 
-	bool DirTreeModel::newFile(const QUrl &baseDir, QString name){
-		QString path(baseDir.path() + "/" + name);
-		QFile nFile(path);
-		if(! nFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::NewOnly))
-			return false;
-		nFile.close();
-		return true;
+bool DirTreeModel::newFile(const QUrl &baseDir, QString name){
+	QString path;
+	if(baseDir.path().isEmpty()){
+		path = QString(m_url.path() + "/" + name);
+	} else{
+		path = QString(baseDir.path() + "/" + name);
 	}
+	QFile nFile(path);
+	if(! nFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::NewOnly))
+		return false;
+	nFile.close();
+	// make sure the parent dir is listed if it was empty before
+	if(! baseDir.path().isEmpty() && canFetchMore(indexForUrl(baseDir))){
+		fetchMore(indexForUrl(baseDir));
+	}
+	return true;
+}
 
+bool DirTreeModel::newDir(const QUrl &baseDir, QString name){
+	QString path;
+	if(baseDir.path().isEmpty()){
+		path = m_url.path();
+	} else{
+		path = baseDir.path();
+	}
+	QDir dir(path);
+	bool ret = dir.mkpath(name);
+	// make sure the parent dir is listed if it was empty before
+	if(! baseDir.path().isEmpty() && canFetchMore(indexForUrl(baseDir))){
+		fetchMore(indexForUrl(baseDir));
+	}
+	return ret;
+}
 

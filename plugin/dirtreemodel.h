@@ -43,7 +43,8 @@ class DirTreeModel: public KDirModel{
 		FileNameRole = Qt::DisplayRole,
 		FileUrlRole,
 		IsDirRole,
-		DisplayRole
+		DisplayRole,
+		ParentUrlRole
 	};
 	
 	QHash<int, QByteArray> roleNames() const;
@@ -100,9 +101,7 @@ class DirTreeModel: public KDirModel{
 
 	bool newFile(const QUrl &, QString);
 
-	bool newFile(QString name){
-		return newFile(m_url, name);
-	}
+	bool newDir(const QUrl &, QString);
 
 	Q_SIGNALS:
 	void urlChanged();
