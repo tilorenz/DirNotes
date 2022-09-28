@@ -13,7 +13,7 @@ class DirTreeModel: public KDirModel{
 
 	Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
 
-	public:
+public:
 
 	DirTreeModel(QObject *parent = nullptr) : 
 		KDirModel(parent)
@@ -44,7 +44,6 @@ class DirTreeModel: public KDirModel{
 		FileUrlRole,
 		IsDirRole,
 		DisplayRole,
-		ParentUrlRole
 	};
 	
 	QHash<int, QByteArray> roleNames() const;
@@ -75,7 +74,7 @@ class DirTreeModel: public KDirModel{
 
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
-	public Q_SLOTS:
+public Q_SLOTS:
 	void dirUp();
 
 /*
@@ -103,13 +102,27 @@ class DirTreeModel: public KDirModel{
 
 	bool newDir(const QUrl &, QString);
 
-	Q_SIGNALS:
+	bool deleteUrl(const QUrl &url);
+
+	bool isParent(const QUrl &parent, const QUrl &child) const{
+		return parent.isParentOf(child);
+	}
+
+	// gets a file in directory startDir that is not except or a child of except
+	QUrl getFirstDoc(QString startDir, const QUrl &except);
+	QUrl getFirstDoc(const QUrl &except){
+		return getFirstDoc(m_url.path(), except);
+	}
+
+Q_SIGNALS:
 	void urlChanged();
 
-	private:
+private:
 	QUrl m_url = QUrl::fromLocalFile(
 			QStandardPaths::writableLocation(
 				QStandardPaths::GenericDataLocation) + QDir::separator() + "dir_notes");
+
+	QString cleanDirPath(const QUrl&);
 };
 #endif
 

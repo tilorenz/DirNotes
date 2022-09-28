@@ -32,7 +32,6 @@ QHash<int, QByteArray> DirTreeModel::roleNames() const {
     roles[FileUrlRole] = "fileUrl";
     roles[IsDirRole] = "isDir";
     roles[DisplayRole] = "display";
-    roles[ParentUrlRole] = "parentUrl";
     return roles;
 }
 
@@ -49,12 +48,6 @@ QVariant DirTreeModel::data(const QModelIndex &index, int role) const{
 			return item.url();
 		case DisplayRole:
 			return KDirModel::data(index, Qt::DisplayRole);
-		case ParentUrlRole:{
-							   const KFileItem parentItem = qvariant_cast<KFileItem>(
-									   KDirModel::data(index.parent(), KDirModel::FileItemRole));
-							   qDebug() << "parent item: " << parentItem.url();
-							   return parentItem.url();
-						   }
 		default:
 			qDebug() << "Requested role: " << role << " for index " << index;
 	}
@@ -77,12 +70,7 @@ void DirTreeModel::dirUp(){
 
 
 bool DirTreeModel::newFile(const QUrl &baseDir, QString name){
-	QString path;
-	if(baseDir.path().isEmpty()){
-		path = QString(m_url.path() + "/" + name);
-	} else{
-		path = QString(baseDir.path() + "/" + name);
-	}
+	QString path = cleanDirPath(baseDir) + "/" + name;
 	QFile nFile(path);
 	if(! nFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::NewOnly))
 		return false;
@@ -94,13 +82,9 @@ bool DirTreeModel::newFile(const QUrl &baseDir, QString name){
 	return true;
 }
 
+
 bool DirTreeModel::newDir(const QUrl &baseDir, QString name){
-	QString path;
-	if(baseDir.path().isEmpty()){
-		path = m_url.path();
-	} else{
-		path = baseDir.path();
-	}
+	QString path = cleanDirPath(baseDir);
 	QDir dir(path);
 	bool ret = dir.mkpath(name);
 	// make sure the parent dir is listed if it was empty before
@@ -109,4 +93,77 @@ bool DirTreeModel::newDir(const QUrl &baseDir, QString name){
 	}
 	return ret;
 }
+
+
+// gives a valid path that a new file/directory can be created in.
+// handles empty paths and paths to files (in which case it'll return the parent dir)
+QString DirTreeModel::cleanDirPath(const QUrl &baseDir){
+	if(baseDir.path().isEmpty()){
+		return m_url.path();
+	} 
+	if((qvariant_cast<bool>(data(indexForUrl(baseDir), IsDirRole)))){
+		return baseDir.path();
+	} 
+	QModelIndex baseIndex = indexForUrl(baseDir);
+	const KFileItem parentItem = qvariant_cast<KFileItem>(
+			KDirModel::data(baseIndex.parent(), KDirModel::FileItemRole));
+	QString path = parentItem.url().path();
+	return path.isEmpty() ? m_url.path() : path;
+}
+
+
+bool DirTreeModel::deleteUrl(const QUrl &url){
+	if(qvariant_cast<bool>(data(indexForUrl(url), IsDirRole))){
+		QDir dir(url.path());
+		return dir.removeRecursively();
+	}
+	QFile file(url.path());
+	return file.remove();
+}
+
+
+QUrl DirTreeModel::getFirstDoc(QString startDir, const QUrl &except){
+	QDir rootDir(startDir);
+	QFileInfoList list = rootDir.entryInfoList(
+			QDir::Files | QDir::NoDotAndDotDot | QDir::Readable | QDir::Writable);
+	for(QFileInfoList::const_iterator i = list.constBegin(); i != list.constEnd(); ++i){
+		QString path = (*i).absoluteFilePath();
+		if(path != except.path()){
+			//qDebug() << "gfd: returning " << path;
+			return path;
+		}
+	}
+	list = rootDir.entryInfoList(QDir::Dirs | QDir:: NoDotAndDotDot);
+	qDebug() << "list: " << list;
+	for(QFileInfoList::const_iterator i = list.constBegin(); i != list.constEnd(); ++i){
+		QString dirPath = (*i).absoluteFilePath();
+		if(dirPath == except.path()){
+			qDebug() << "Skipping dir " << dirPath;
+			//continue;
+		} else{
+			QString ret = getFirstDoc(dirPath, except).path();
+			if(! ret.isEmpty()){
+				return ret;
+			}
+		}
+	}
+	return QUrl("");
+}
+
+
+//bool DirTreeModel::isParent(const QUrl &parent, const QUrl &child) const{
+	//QModelIndex parentIndex = indexForUrl(parent);
+	//QModelIndex childIndex = indexForUrl(child);
+	//if(! parentIndex.isValid() || ! childIndex.isValid()){
+		//qDebug() << "isparent: Invalid index.";
+		//return true;
+	//}
+	//for(QModelIndex p = childIndex.parent(); p.isValid(); p = p.parent()){
+		//if(p == parentIndex){
+			//return true;
+		//}
+	//}
+	//return false;
+//}
+
 

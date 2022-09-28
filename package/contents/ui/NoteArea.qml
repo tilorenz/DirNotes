@@ -17,6 +17,7 @@ ColumnLayout{
 
 	property alias ta: mainTextArea
 	property var currDoc: ""
+	property alias text: docModel.text
 
 	WDNPlugin.DocModel{
 		id: docModel

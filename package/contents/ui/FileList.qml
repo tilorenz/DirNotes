@@ -69,6 +69,30 @@ ColumnLayout{
 	}
 
 	Dialog{
+		id: confirmationDialog
+		standardButtons: Dialog.Ok | Dialog.Cancel
+		modal: true
+		property string fileName: ""
+		property url delUrl: ""
+
+		contentItem: PComp3.Label{
+			text: "Do you really want to delete " + confirmationDialog.fileName + "?"
+		}
+
+		onAccepted: {
+			// load another note in case the current one is deleted
+			if(delUrl == fChooser.currDoc || dtMod.isParent(delUrl, fChooser.currDoc)){
+				fChooser.currDoc = dtMod.getFirstDoc(delUrl) || fChooser.notesPath + '/New Note.md'
+				nArea.text = ""
+				dtMod.deleteUrl(delUrl)
+				fileTree.currentIndex = -1
+			} else{
+				dtMod.deleteUrl(delUrl)
+			}
+		}
+	}
+
+	Dialog{
 		id: nameDialog
 		standardButtons: Dialog.Ok | Dialog.Cancel
 		modal: true
@@ -97,6 +121,8 @@ ColumnLayout{
 		clip: true
 		Layout.fillWidth: true
 		Layout.fillHeight: true
+		// IMO the overshoot is annoying when using mouse/laptop touchpad
+		boundsBehavior: Flickable.DragOverBounds 
 
 		model: sortMod
 		// don't automatically highlight/select the first item
@@ -160,13 +186,7 @@ ColumnLayout{
 						onClicked: {
 							nameDialog.createFun = dtMod.newFile
 							nameDialog.defaultText = "FileName.md"
-							// if the user clicked on a directory, make a new file inside.
-							// else, make a new file next to the file the user clicked.
-							if(isDir){
-								nameDialog.baseUrl = fileUrl
-							} else{
-								nameDialog.baseUrl = parentUrl
-							}
+							nameDialog.baseUrl = fileUrl
 							nameDialog.open()
 						}
 					}
@@ -175,18 +195,17 @@ ColumnLayout{
 						onClicked: {
 							nameDialog.createFun = dtMod.newDir
 							nameDialog.defaultText = "NewDir"
-							// if the user clicked on a directory, make a new directory inside.
-							// else, make a new directory next to the file the user clicked.
-							if(isDir){
-								nameDialog.baseUrl = fileUrl
-							} else{
-								nameDialog.baseUrl = parentUrl
-							}
+							nameDialog.baseUrl = fileUrl
 							nameDialog.open()
 						}
 					}
 					PComp3.MenuItem{
 						text: "Delete"
+						onClicked: {
+							confirmationDialog.fileName = fileName
+							confirmationDialog.delUrl = fileUrl
+							confirmationDialog.open()
+						}
 					}
 					PComp3.MenuItem{
 						text: "Open in external program"
