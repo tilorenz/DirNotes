@@ -18,6 +18,7 @@ ColumnLayout{
 	property alias ta: mainTextArea
 	property var currDoc: ""
 	property alias text: docModel.text
+	property var fileAboutToBeRenamed: docModel.fileAboutToBeRenamed
 
 	WDNPlugin.DocModel{
 		id: docModel
@@ -31,7 +32,6 @@ ColumnLayout{
 			docModel.save()
 			docModel.active = false
 		}
-		//TODO shorter time for testing, use 20s or so for production
 		interval: 10000
 	}
 

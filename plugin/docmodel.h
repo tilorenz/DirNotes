@@ -53,6 +53,7 @@ class DocModel : public QObject{
 	public Q_SLOTS:
 	bool save();
 	void handleFileChanged();
+	void fileAboutToBeRenamed();
 
 	Q_SIGNALS:
 	void textChanged();

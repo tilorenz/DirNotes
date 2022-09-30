@@ -69,17 +69,17 @@ void DirTreeModel::dirUp(){
 }
 
 
-bool DirTreeModel::newFile(const QUrl &baseDir, QString name){
+QUrl DirTreeModel::newFile(const QUrl &baseDir, QString name){
 	QString path = cleanDirPath(baseDir) + "/" + name;
 	QFile nFile(path);
 	if(! nFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::NewOnly))
-		return false;
+		return QUrl("");
 	nFile.close();
 	// make sure the parent dir is listed if it was empty before
 	if(! baseDir.path().isEmpty() && canFetchMore(indexForUrl(baseDir))){
 		fetchMore(indexForUrl(baseDir));
 	}
-	return true;
+	return QUrl(path);
 }
 
 
@@ -129,25 +129,47 @@ QUrl DirTreeModel::getFirstDoc(QString startDir, const QUrl &except){
 	for(QFileInfoList::const_iterator i = list.constBegin(); i != list.constEnd(); ++i){
 		QString path = (*i).absoluteFilePath();
 		if(path != except.path()){
-			//qDebug() << "gfd: returning " << path;
 			return path;
 		}
 	}
 	list = rootDir.entryInfoList(QDir::Dirs | QDir:: NoDotAndDotDot);
-	qDebug() << "list: " << list;
 	for(QFileInfoList::const_iterator i = list.constBegin(); i != list.constEnd(); ++i){
 		QString dirPath = (*i).absoluteFilePath();
 		if(dirPath == except.path()){
-			qDebug() << "Skipping dir " << dirPath;
-			//continue;
-		} else{
-			QString ret = getFirstDoc(dirPath, except).path();
-			if(! ret.isEmpty()){
-				return ret;
-			}
+			continue;
+		}
+		QString ret = getFirstDoc(dirPath, except).path();
+		if(! ret.isEmpty()){
+			return ret;
 		}
 	}
 	return QUrl("");
+}
+
+QUrl DirTreeModel::renameFile(const QUrl &baseUrl, QString newName){
+	QFileInfo info(baseUrl.path());
+	QDir parentDir = info.dir();
+	qDebug() << "renameFile: parentDir: " << parentDir.path();
+	QString oldName = baseUrl.fileName();
+	if(parentDir.rename(oldName, newName)){
+		return QUrl(parentDir.absoluteFilePath(newName));
+	} else{
+		return baseUrl;
+	}
+}
+
+
+QUrl DirTreeModel::renameDir(const QUrl &baseUrl, QString newName, const QUrl &openFile){
+	QDir dir(baseUrl.path());
+	QString oldName = dir.dirName();
+	QString relativePath = dir.relativeFilePath(openFile.path());
+	dir.cdUp();
+	if(! dir.rename(oldName, newName)){
+		qDebug() << "Failed to rename Dir from " << oldName  << " to " << newName;
+		return openFile;
+	}
+	dir.cd(newName);
+	return QUrl(dir.absoluteFilePath(relativePath));
 }
 
 

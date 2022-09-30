@@ -83,6 +83,10 @@ public Q_SLOTS:
 	QVariant isDir(const QModelIndex &index) const{
 		return data(index, Roles::IsDirRole);
 	}
+
+	QVariant urlIsDir(const QUrl &url) const{
+		return isDir(indexForUrl(url));
+	}
 	
 	QVariant urlForIndex(const QModelIndex &index) const{
 		return data(index, Roles::FileUrlRole);
@@ -98,7 +102,7 @@ public Q_SLOTS:
 		openInFileMan(m_url);
 	}
 
-	bool newFile(const QUrl &, QString);
+	QUrl newFile(const QUrl &, QString);
 
 	bool newDir(const QUrl &, QString);
 
@@ -113,6 +117,10 @@ public Q_SLOTS:
 	QUrl getFirstDoc(const QUrl &except){
 		return getFirstDoc(m_url.path(), except);
 	}
+
+	QUrl renameFile(const QUrl &baseUrl, QString newName);
+
+	QUrl renameDir(const QUrl &baseUrl, QString newName, const QUrl &openFile);
 
 Q_SIGNALS:
 	void urlChanged();

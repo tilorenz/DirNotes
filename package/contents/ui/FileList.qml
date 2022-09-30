@@ -92,6 +92,23 @@ ColumnLayout{
 		}
 	}
 
+	function rename(baseUrl, newName){
+		if(dtMod.isParent(baseUrl, fChooser.currDoc) || baseUrl == fChooser.currDoc){
+			nArea.fileAboutToBeRenamed()
+			if(dtMod.urlIsDir(baseUrl)){
+				fChooser.currDoc = dtMod.renameDir(baseUrl, newName, fChooser.currDoc)
+			} else{
+				var content = nArea.text
+				fChooser.currDoc = dtMod.newFile(baseUrl, newName)
+				nArea.text = content
+				dtMod.deleteUrl(baseUrl)
+			}
+			fileTree.currentIndex = -1
+		} else{
+			dtMod.renameFile(baseUrl, newName);
+		}
+	}
+
 	Dialog{
 		id: nameDialog
 		standardButtons: Dialog.Ok | Dialog.Cancel
@@ -180,6 +197,12 @@ ColumnLayout{
 					id: delegateMenu
 					PComp3.MenuItem{
 						text: "Rename"
+						onClicked: {
+							nameDialog.createFun = rename
+							nameDialog.defaultText = fileName
+							nameDialog.baseUrl = fileUrl
+							nameDialog.open()
+						}
 					}
 					PComp3.MenuItem{
 						text: "New note"

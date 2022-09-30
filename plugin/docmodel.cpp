@@ -67,6 +67,16 @@ void DocModel::loadDoc(QUrl url, bool forceReload){
 }
 
 
+void DocModel::fileAboutToBeRenamed(){
+	save();
+	// don't emit the change signal, we don't want to set other component's url
+	m_url.setPath("");
+	if(! m_watcher.files().isEmpty()){
+		m_watcher.removePaths(m_watcher.files());
+	}
+}
+
+
 bool DocModel::save(){
 	if(!m_url.isValid()){
 		qDebug() << "Can't save to URL " << m_url <<" (empty or invalid)" << Qt::endl;
